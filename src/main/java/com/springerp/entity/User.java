@@ -51,12 +51,10 @@ public class User {
     @Size(min = 5, message = "Address must be at least 5 characters")
     private String address;
 
-    @SuppressWarnings("JpaDataSourceORMInspection")
     @Column(name = "created_at", nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
-    @SuppressWarnings("JpaDataSourceORMInspection")
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
