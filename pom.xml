@@ -168,6 +168,6 @@
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>expense-tracking-api</finalName>
+        <finalName>spring-erp</finalName>
     </build>
 </project>
