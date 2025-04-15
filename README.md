@@ -36,7 +36,7 @@
 - **Response Compression**: Enable response compression for better performance.
 - **User Management**: Manage user roles and permissions.
 - **Product Management**: Add, update, and delete products.
-- **Category Management**: Organize products into categories.
+- **Category Management**: Organize products into categories with a one-to-many relationship.
 - **Inventory Management**: Track and manage inventory levels efficiently.
 - **Order Processing**: Streamline order management and fulfillment.
 - **Customer Relationship Management (CRM)**: Manage customer interactions and data.
@@ -65,6 +65,54 @@
    - MySQL 8.0
    - Optimized table structures
    - Indexes for performance
+---
+
+## API Endpoints
+
+### User Management
+- **Create User**: `POST /users`
+- **Update User**: `PUT /users/{id}`
+- **Delete User**: `DELETE /users/{id}`
+- **Get User by ID**: `GET /users/{id}`
+- **Get All Users**: `GET /users`
+
+### Authentication
+- **Register**: `POST /register`
+- **Login**: `POST /login`
+- **Logout**: `POST /logout`
+- **Refresh Token**: `POST /refresh-token`
+- **Change Password**: `POST /change-password`
+- **Forgot Password**: `POST /forgot-password`
+- **Reset Password**: `POST /reset-password`
+
+### Product Management
+- **Create Product**: `POST /products`
+- **Update Product**: `PUT /products/{id}`
+- **Delete Product**: `DELETE /products/{id}`
+- **Get Product by ID**: `GET /products/{id}`
+- **Get All Products**: `GET /products`
+
+### Category Management
+- **Create Category**: `POST /categories`
+- **Update Category**: `PUT /categories/{id}`
+- **Delete Category**: `DELETE /categories/{id}`
+- **Get Category by ID**: `GET /categories/{id}`
+- **Get All Categories**: `GET /categories`
+
+### Inventory Management
+- **Create Inventory**: `POST /inventories`
+- **Update Inventory**: `PUT /inventories/{id}`
+- **Delete Inventory**: `DELETE /inventories/{id}`
+- **Get Inventory by ID**: `GET /inventories/{id}`
+- **Get All Inventories**: `GET /inventories`
+
+### Order Management
+- **Create Order**: `POST /orders`
+- **Update Order**: `PUT /orders/{id}`
+- **Delete Order**: `DELETE /orders/{id}`
+- **Get Order by ID**: `GET /orders/{id}`
+- **Get All Orders**: `GET /orders`
+
 ---
 
 ## Getting Started
