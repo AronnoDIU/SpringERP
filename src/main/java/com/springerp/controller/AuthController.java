@@ -7,6 +7,7 @@ import com.springerp.entity.User;
 import com.springerp.service.UserService;
 import com.springerp.util.JwtTokenUtil;
 import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,5 +91,33 @@ public class AuthController {
                     .body(new ErrorObject(HttpStatus.INTERNAL_SERVER_ERROR.value(), 
                             "An error occurred during authentication: " + e.getMessage(), new Date()));
         }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logoutUser(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+            jwtTokenUtil.invalidateToken(token); // Invalidate the token
+        }
+        SecurityContextHolder.clearContext();
+        return ResponseEntity.ok("User logged out successfully.");
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+            if (jwtTokenUtil.isTokenExpired(token)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ErrorObject(HttpStatus.UNAUTHORIZED.value(), "Token has expired", new Date()));
+            }
+            String username = jwtTokenUtil.getUsernameFromToken(token);
+            String newToken = jwtTokenUtil.generateToken(username);
+            return ResponseEntity.ok(new JwtResponse(newToken));
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorObject(HttpStatus.BAD_REQUEST.value(), "Invalid token", new Date()));
     }
 }
