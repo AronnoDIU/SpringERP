@@ -25,4 +25,11 @@ public class ErrorResponse {
         this.timestamp = timestamp;
         this.errors = new HashMap<>();
     }
+
+    public ErrorResponse(int value, String message) {
+        this.status = value;
+        this.message = message;
+        this.timestamp = LocalDateTime.now();
+        this.errors = new HashMap<>();
+    }
 }

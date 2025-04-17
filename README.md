@@ -187,11 +187,39 @@
 - `DELETE /api/purchase-orders/{id}` - Delete purchase order
 
 ### Invoice Endpoints
-- `GET /api/invoices` - List all invoices
-- `GET /api/invoices/{id}` - Get invoice by ID
-- `POST /api/invoices` - Create new invoice
-- `PUT /api/invoices/{id}` - Update invoice
-- `DELETE /api/invoices/{id}` - Delete invoice
+- `GET /api/v1/invoices` - List all invoices with pagination
+  - Parameters:
+    - `page` (optional, default: 0)—Page number
+    - `size` (optional, default: 10) - Items per page
+    - `sortBy` (optional, default: "id")—Field to sort by
+  - Response: List of invoices with pagination
+
+- `GET /api/v1/invoices/{id}` - Get invoice by ID
+  - Response: Single invoice details
+
+- `POST /api/v1/invoices` - Create new invoice
+  - Request body: Invoice details including items
+  - Response: Created invoice with generated invoice number
+
+- `PUT /api/v1/invoices/{id}` - Update invoice
+  - Request body: Updated invoice details
+  - Response: Updated invoice information
+
+- `DELETE /api/v1/invoices/{id}` - Delete invoice
+  - Response: 204 No Content
+
+- `GET /api/v1/invoices/status/{status}` - Get invoices by status
+  - Parameters:
+    - `status`: DRAFT, SENT, PAID, OVERDUE, CANCELLED, VOID
+  - Response: List of invoices with a specified status
+
+- `PATCH /api/v1/invoices/{id}/status` - Update invoice status
+  - Parameters:
+    - `status`: New status value
+  - Response: Updated invoice with new status
+
+- `GET /api/v1/invoices/{id}/pdf` - Generate PDF for invoice
+  - Response: PDF file download
 
 ---
 
