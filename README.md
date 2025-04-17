@@ -16,6 +16,8 @@
 ## Table of Contents
 
 - [Features](#features)
+- [Performance Optimizations](#performance-optimizations)
+- [API Endpoints](#api-endpoints)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
