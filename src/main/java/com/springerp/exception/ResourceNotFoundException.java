@@ -1,4 +1,4 @@
-package com.springerp.exceptions;
+package com.springerp.exception;
 
 import java.io.Serial;
 

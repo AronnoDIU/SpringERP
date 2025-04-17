@@ -1,8 +1,8 @@
 package com.springerp.service;
 
 import com.springerp.entity.User;
-import com.springerp.exceptions.ResourceNotFoundException;
-import com.springerp.exceptions.UserAlreadyExistsException;
+import com.springerp.exception.ResourceNotFoundException;
+import com.springerp.exception.UserAlreadyExistsException;
 import com.springerp.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

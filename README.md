@@ -81,9 +81,7 @@
 - **Login**: `POST /login`
 - **Logout**: `POST /logout`
 - **Refresh Token**: `POST /refresh-token`
-- **Change Password**: `POST /change-password`
 - **Forgot Password**: `POST /forgot-password`
-- **Reset Password**: `POST /reset-password`
 
 ### Product Management
 - **Create Product**: `POST /products`

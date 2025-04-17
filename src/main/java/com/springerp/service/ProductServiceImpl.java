@@ -1,7 +1,7 @@
 package com.springerp.service;
 
 import com.springerp.entity.Product;
-import com.springerp.exceptions.ResourceNotFoundException;
+import com.springerp.exception.ResourceNotFoundException;
 import com.springerp.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

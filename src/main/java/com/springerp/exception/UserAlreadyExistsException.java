@@ -1,4 +1,4 @@
-package com.springerp.exceptions;
+package com.springerp.exception;
 
 public class UserAlreadyExistsException extends RuntimeException {
 

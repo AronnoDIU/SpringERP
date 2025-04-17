@@ -7,13 +7,16 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.util.Date;
+import java.time.LocalDateTime;
 
-@Data
-@NoArgsConstructor
 @Entity
 @Table(name = "users")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
     @Id
@@ -68,4 +71,10 @@ public class User {
     protected void onUpdate() {
         updatedAt = new Date();
     }
+    
+    @Column(name = "reset_password_token")
+    private String resetPasswordToken;
+    
+    @Column(name = "reset_password_token_expiry")
+    private LocalDateTime resetPasswordTokenExpiry;
 }
