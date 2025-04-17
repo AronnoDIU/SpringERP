@@ -45,6 +45,51 @@
 - **Financial Accounting**: Automate financial transactions and reporting.
 - **Reporting and Analytics**: Generate reports and analyze business performance.
 
+### Customer Management
+- Customer profile management
+- Customer interaction tracking
+- Order history and management
+- Customer communication logs
+
+### Supplier Management
+- Supplier profile management
+- Purchase order tracking
+- Supplier interaction history
+- Supply chain management
+
+### Order Processing
+- Order creation and management
+- Order status tracking
+- Multiple order items support
+- Order history and analytics
+
+### Purchase Management
+- Purchase order creation
+- Supplier-specific purchase tracking
+- Purchase order items management
+- Delivery tracking
+
+### Common Features
+- Audit tracking (creation and modification timestamps)
+- Relationship management between entities
+- Data validation and integrity
+- Scalable data model
+
+## Technology Stack
+
+### Backend
+- Java 21
+- Spring Boot 3.2.3
+- Spring Data JPA
+- Jakarta Persistence (JPA)
+- Lombok
+- ModelMapper
+- MySQL 8.0
+- Caffeine
+- JWT
+- Spring Security
+- Bucket4j
+
 ## Performance Optimizations
 
 - **Caching Strategy**:
@@ -112,6 +157,41 @@
 - **Delete Order**: `DELETE /orders/{id}`
 - **Get Order by ID**: `GET /orders/{id}`
 - **Get All Orders**: `GET /orders`
+
+### Customer Endpoints
+- `GET /api/customers` - List all customers
+- `GET /api/customers/{id}` - Get customer by ID
+- `POST /api/customers` - Create new customer
+- `PUT /api/customers/{id}` - Update customer
+- `DELETE /api/customers/{id}` - Delete customer
+
+### Supplier Endpoints
+- `GET /api/suppliers` - List all suppliers
+- `GET /api/suppliers/{id}` - Get supplier by ID
+- `POST /api/suppliers` - Create new supplier
+- `PUT /api/suppliers/{id}` - Update supplier
+- `DELETE /api/suppliers/{id}` - Delete supplier
+
+### Order Endpoints
+- `GET /api/orders` - List all orders
+- `GET /api/orders/{id}` - Get order by ID
+- `POST /api/orders` - Create new order
+- `PUT /api/orders/{id}` - Update order
+- `DELETE /api/orders/{id}` - Delete order
+
+### Purchase Order Endpoints
+- `GET /api/purchase-orders` - List all purchase orders
+- `GET /api/purchase-orders/{id}` - Get purchase order by ID
+- `POST /api/purchase-orders` - Create new purchase order
+- `PUT /api/purchase-orders/{id}` - Update purchase order
+- `DELETE /api/purchase-orders/{id}` - Delete purchase order
+
+### Invoice Endpoints
+- `GET /api/invoices` - List all invoices
+- `GET /api/invoices/{id}` - Get invoice by ID
+- `POST /api/invoices` - Create new invoice
+- `PUT /api/invoices/{id}` - Update invoice
+- `DELETE /api/invoices/{id}` - Delete invoice
 
 ---
 
@@ -181,6 +261,12 @@ http://localhost:8080/api/v1
 
 Contributions are welcome! Please follow the [Contributing Guidelines](CONTRIBUTING.md) to contribute to this project.
 
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
 ---
 
 ## License
@@ -188,6 +274,11 @@ Contributions are welcome! Please follow the [Contributing Guidelines](CONTRIBUT
 This project is licensed under the [MIT License](LICENSE).
 
 ---
+
+## Support
+
+For support, please open an issue in the GitHub issue tracker or contact the development team.
+Built with ❤️ using Spring Boot and Java
 
 ## Author
 
