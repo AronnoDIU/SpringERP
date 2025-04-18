@@ -19,4 +19,5 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     Optional<Invoice> findByCompanyAndInvoiceNumber(Company company, String invoiceNumber);
     Optional<Invoice> findByCompanyIdAndId(Long companyId, Long id);
     Page<Invoice> findByCompany(Company company, Pageable pageable);
+    Optional<Invoice> findByCompanyAndId(Company company, Long id);
 }

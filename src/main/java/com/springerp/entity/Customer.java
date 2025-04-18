@@ -24,8 +24,11 @@ public class Customer {
     private String email;
     private String phone;
     private String address;
-    private String companyName;
-    
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", nullable = false)
+    private Company company;
+
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<CustomerInteraction> interactions = new ArrayList<>();
     

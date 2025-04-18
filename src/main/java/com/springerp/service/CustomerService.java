@@ -32,7 +32,7 @@ public class CustomerService {
         customer.setEmail(customerDetails.getEmail());
         customer.setPhone(customerDetails.getPhone());
         customer.setAddress(customerDetails.getAddress());
-        customer.setCompanyName(customerDetails.getCompanyName());
+        customer.setCompany(customerDetails.getCompany());
         
         log.info("Updating customer with id: {}", id);
         return customerRepository.save(customer);
