@@ -11,6 +11,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -30,20 +31,21 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
     
     @Override
-    public InvoiceDTO createInvoice(InvoiceDTO invoiceDTO) {
+    public InvoiceDTO createInvoice(Long companyId, InvoiceDTO invoiceDTO) {
         Invoice invoice = modelMapper.map(invoiceDTO, Invoice.class);
-        invoice.setInvoiceNumber(generateInvoiceNumber());
+        invoice.setInvoiceNumber(generateInvoiceNumber(companyId));
         invoice.setStatus(InvoiceStatus.DRAFT);
+        invoice.setCompanyId(companyId);
         
         calculateTotals(invoice);
         
         Invoice savedInvoice = invoiceRepository.save(invoice);
         return modelMapper.map(savedInvoice, InvoiceDTO.class);
     }
-    
+
     @Override
-    public InvoiceDTO updateInvoice(Long id, InvoiceDTO invoiceDTO) {
-        Invoice existingInvoice = invoiceRepository.findById(id)
+    public InvoiceDTO updateInvoice(Long companyId, Long id, InvoiceDTO invoiceDTO) {
+        Invoice existingInvoice = invoiceRepository.findByCompanyIdAndId(companyId, id)
             .orElseThrow(() -> new ResourceNotFoundException("Invoice not found with id: " + id));
         
         modelMapper.map(invoiceDTO, existingInvoice);
@@ -52,56 +54,68 @@ public class InvoiceServiceImpl implements InvoiceService {
         Invoice updatedInvoice = invoiceRepository.save(existingInvoice);
         return modelMapper.map(updatedInvoice, InvoiceDTO.class);
     }
-    
+
     @Override
-    public InvoiceDTO getInvoiceById(Long id) {
-        Invoice invoice = invoiceRepository.findById(id)
+    public InvoiceDTO getInvoiceById(Long companyId, Long id) {
+        Invoice invoice = invoiceRepository.findByCompanyIdAndId(companyId, id)
             .orElseThrow(() -> new ResourceNotFoundException("Invoice not found with id: " + id));
         return modelMapper.map(invoice, InvoiceDTO.class);
     }
-    
+
     @Override
-    public List<InvoiceDTO> getAllInvoices(Pageable pageable) {
-        return invoiceRepository.findAll(pageable)
-            .getContent()
-            .stream()
-            .map(invoice -> modelMapper.map(invoice, InvoiceDTO.class))
-            .collect(Collectors.toList());
+    public Page<InvoiceDTO> getAllInvoices(Long companyId, Pageable pageable) {
+        return invoiceRepository.findByCompanyId(companyId, pageable)
+            .map(invoice -> modelMapper.map(invoice, InvoiceDTO.class));
     }
-    
+
     @Override
-    public void deleteInvoice(Long id) {
-        Invoice invoice = invoiceRepository.findById(id)
+    public void deleteInvoice(Long companyId, Long id) {
+        Invoice invoice = invoiceRepository.findByCompanyIdAndId(companyId, id)
             .orElseThrow(() -> new ResourceNotFoundException("Invoice not found with id: " + id));
         invoiceRepository.delete(invoice);
     }
-    
+
     @Override
-    public List<InvoiceDTO> getInvoicesByStatus(InvoiceStatus status) {
-        return invoiceRepository.findByStatus(status)
+    public List<InvoiceDTO> getInvoicesByStatus(Long companyId, InvoiceStatus status) {
+        return invoiceRepository.findByCompanyIdAndStatus(companyId, status)
             .stream()
             .map(invoice -> modelMapper.map(invoice, InvoiceDTO.class))
             .collect(Collectors.toList());
     }
-    
+
     @Override
-    public InvoiceDTO updateInvoiceStatus(Long id, InvoiceStatus status) {
-        Invoice invoice = invoiceRepository.findById(id)
+    public InvoiceDTO updateInvoiceStatus(Long companyId, Long id, InvoiceStatus status) {
+        Invoice invoice = invoiceRepository.findByCompanyIdAndId(companyId, id)
             .orElseThrow(() -> new ResourceNotFoundException("Invoice not found with id: " + id));
         
         invoice.setStatus(status);
         Invoice updatedInvoice = invoiceRepository.save(invoice);
         return modelMapper.map(updatedInvoice, InvoiceDTO.class);
     }
-    
+
+@Override
+public List<InvoiceDTO> getInvoicesByCustomer(Long companyId, Long customerId) {
+    return invoiceRepository.findByCompanyIdAndCustomerId(companyId, customerId)
+        .stream()
+        .map(invoice -> modelMapper.map(invoice, InvoiceDTO.class))
+        .collect(Collectors.toList());
+}
+
+@Override
+public List<InvoiceDTO> getInvoicesByOrder(Long companyId, Long orderId) {
+    return invoiceRepository.findByCompanyIdAndOrderId(companyId, orderId)
+        .stream()
+        .map(invoice -> modelMapper.map(invoice, InvoiceDTO.class))
+        .collect(Collectors.toList());
+}
     @Override
-    public byte[] generateInvoicePdf(Long id) {
+    public byte[] generateInvoicePdf(Long companyId, Long id) {
         // Implement PDF generation logic here
         throw new UnsupportedOperationException("PDF generation not implemented yet");
     }
     
-    private String generateInvoiceNumber() {
-        return "INV-" + System.currentTimeMillis();
+    private String generateInvoiceNumber(Long companyId) {
+        return String.format("INV-%d-%d", companyId, System.currentTimeMillis());
     }
     
     private void calculateTotals(Invoice invoice) {

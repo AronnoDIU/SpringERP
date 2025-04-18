@@ -16,8 +16,12 @@ import java.util.List;
 @Builder
 public class InvoiceDTO {
     private Long id;
+    private Long companyId;
+    private String companyName;
     private String invoiceNumber;
     private Long orderId;
+    private Long customerId;
+    private String customerName;
     private LocalDateTime invoiceDate;
     private LocalDateTime dueDate;
     private InvoiceStatus status;
@@ -29,6 +33,8 @@ public class InvoiceDTO {
     private String paymentTerms;
     private String notes;
     private List<InvoiceItemDTO> items;
+    private String createdByUsername;
+    private String updatedByUsername;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

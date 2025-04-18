@@ -19,14 +19,24 @@ public class InvoiceItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "invoice_id")
     private Invoice invoice;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private Product product;
     
     private String description;
     private Integer quantity;
     private BigDecimal unitPrice;
+    private BigDecimal taxRate;
+    private BigDecimal taxAmount;
     private BigDecimal totalPrice;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by")
+    private User createdBy;
     
     private LocalDateTime createdAt;
     

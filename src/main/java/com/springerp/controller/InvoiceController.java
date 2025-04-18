@@ -1,5 +1,6 @@
 package com.springerp.controller;
 
+import com.springerp.config.context.CompanyContextHolder;
 import com.springerp.exception.ErrorResponse;
 import com.springerp.exception.ResourceNotFoundException;
 import com.springerp.dto.InvoiceDTO;
@@ -7,6 +8,7 @@ import com.springerp.entity.InvoiceStatus;
 import com.springerp.service.InvoiceService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,58 +23,75 @@ import java.util.List;
 public class InvoiceController {
     
     private final InvoiceService invoiceService;
+    private final CompanyContextHolder companyContextHolder;
     
-    public InvoiceController(InvoiceService invoiceService) {
+    public InvoiceController(InvoiceService invoiceService, CompanyContextHolder companyContextHolder) {
         this.invoiceService = invoiceService;
+        this.companyContextHolder = companyContextHolder;
     }
     
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public InvoiceDTO createInvoice(@Valid @RequestBody InvoiceDTO invoiceDTO) {
-        return invoiceService.createInvoice(invoiceDTO);
+        Long companyId = companyContextHolder.getCompanyId();
+        return invoiceService.createInvoice(companyId, invoiceDTO);
     }
     
     @PutMapping("/{id}")
-    public InvoiceDTO updateInvoice(@PathVariable Long id, @Valid @RequestBody InvoiceDTO invoiceDTO) {
-        return invoiceService.updateInvoice(id, invoiceDTO);
+    public InvoiceDTO updateInvoice(
+            @PathVariable Long id,
+            @Valid @RequestBody InvoiceDTO invoiceDTO) {
+        Long companyId = companyContextHolder.getCompanyId();
+        return invoiceService.updateInvoice(companyId, id, invoiceDTO);
     }
     
     @GetMapping("/{id}")
     public InvoiceDTO getInvoice(@PathVariable Long id) {
-        return invoiceService.getInvoiceById(id);
+        Long companyId = companyContextHolder.getCompanyId();
+        return invoiceService.getInvoiceById(companyId, id);
     }
     
     @GetMapping
-    public List<InvoiceDTO> getAllInvoices(
+    public Page<InvoiceDTO> getAllInvoices(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy) {
-        
+        Long companyId = companyContextHolder.getCompanyId();
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        return invoiceService.getAllInvoices(pageable);
+        return invoiceService.getAllInvoices(companyId, pageable);
     }
     
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteInvoice(@PathVariable Long id) {
-        invoiceService.deleteInvoice(id);
+        Long companyId = companyContextHolder.getCompanyId();
+        invoiceService.deleteInvoice(companyId, id);
     }
     
     @GetMapping("/status/{status}")
     public List<InvoiceDTO> getInvoicesByStatus(@PathVariable InvoiceStatus status) {
-        return invoiceService.getInvoicesByStatus(status);
+        Long companyId = companyContextHolder.getCompanyId();
+        return invoiceService.getInvoicesByStatus(companyId, status);
+    }
+    
+    @GetMapping("/customers/{customerId}")
+    public List<InvoiceDTO> getInvoicesByCustomer(@PathVariable Long customerId) {
+        Long companyId = companyContextHolder.getCompanyId();
+        return invoiceService.getInvoicesByCustomer(companyId, customerId);
     }
     
     @PatchMapping("/{id}/status")
     public InvoiceDTO updateInvoiceStatus(
             @PathVariable Long id,
             @RequestParam InvoiceStatus status) {
-        return invoiceService.updateInvoiceStatus(id, status);
+        Long companyId = companyContextHolder.getCompanyId();
+        return invoiceService.updateInvoiceStatus(companyId, id, status);
     }
     
     @GetMapping("/{id}/pdf")
     public ResponseEntity<byte[]> generateInvoicePdf(@PathVariable Long id) {
-        byte[] pdfContent = invoiceService.generateInvoicePdf(id);
+        Long companyId = companyContextHolder.getCompanyId();
+        byte[] pdfContent = invoiceService.generateInvoicePdf(companyId, id);
         
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
