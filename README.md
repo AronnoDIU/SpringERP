@@ -90,6 +90,14 @@
 - Spring Security
 - Bucket4j
 
+### Data Model Updates
+- Multi-company architecture
+- Company-based data segregation
+- Cross-company relationship management
+- Company-specific configuration management
+- Company-based invoicing and order tracking
+- Company-customer relationship management
+
 ## Performance Optimizations
 
 - **Caching Strategy**:
@@ -115,6 +123,42 @@
 ---
 
 ## API Endpoints
+
+### Company Management
+- Company profile management
+- Multiple company support
+- Company-specific settings
+- Company-customer relationship management
+- Company-based invoicing
+- Company-specific order tracking
+
+### Company Management
+- `GET /api/v1/companies` - List all companies with pagination
+  - Parameters:
+    - `page` (optional, default: 0) - Page number
+    - `size` (optional, default: 10) - Items per page
+    - `sortBy` (optional, default: "id") - Field to sort by
+  - Response: List of companies with pagination
+
+- `GET /api/v1/companies/{id}` - Get company by ID
+  - Response: Single company details with associated customers, orders, and invoices
+
+- `POST /api/v1/companies` - Create new company
+  - Request body: Company details including registration info
+  - Response: Created company details
+
+- `PUT /api/v1/companies/{id}` - Update company
+  - Request body: Updated company details
+  - Response: Updated company information
+
+- `DELETE /api/v1/companies/{id}` - Delete company
+  - Response: 204 No Content
+
+- `GET /api/v1/companies/search` - Search companies
+  - Parameters:
+    - `query`: Search term for company name or registration number
+  - Response: List of matching companies
+
 
 ### User Management
 - **Create User**: `POST /users`
