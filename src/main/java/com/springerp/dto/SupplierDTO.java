@@ -1,5 +1,8 @@
 package com.springerp.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,11 +17,24 @@ import java.util.List;
 @Builder
 public class SupplierDTO {
     private Long id;
+
+    @NotBlank(message = "Supplier name cannot be blank")
+    @Size(max = 150, message = "Name must be at most 150 characters")
     private String name;
+
+    @Email(message = "Email should be valid")
+    @Size(max = 100)
     private String email;
+
+    @Size(max = 20, message = "Phone must be at most 20 characters")
     private String phone;
+
+    @Size(max = 255)
     private String address;
+
+    @Size(max = 150)
     private String companyName;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<SupplierInteractionDTO> interactions;

@@ -1,32 +1,145 @@
 server:
+  port: 8080
   compression:
     enabled: true
     mime-types: application/json,application/xml,text/html,text/xml,text/plain
     min-response-size: 1024
+  servlet:
+    context-path: /api/v1
 
 spring:
-  cache:
-    cache-names: users
-    caffeine:
-      spec: maximumSize=500,expireAfterWrite=60m
-  
+  application:
+    name: SpringERP
+
+  # Data Source Configuration
   datasource:
     url: ${MYSQL_URL}
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
-  
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  # JPA Configuration
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: false
+    open-in-view: false
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.MySQLDialect
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        generate_statistics: false
+        jdbc:
+          batch_size: 25
+          fetch_size: 50
+        order_inserts: true
+        order_updates: true
 
+  # Cache Configuration
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=60m
+    cache-names:
+      - users
+      - accounts
+      - employees
+      - products
+      - inventory
+
+
+  # Jackson Configuration
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+      indent-output: true
+    deserialization:
+      fail-on-unknown-properties: false
+    timezone: UTC
+    date-format: yyyy-MM-dd'T'HH:mm:ss
+
+  # Mail Configuration
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+  # Redis Configuration (Optional - for distributed caching)
+  redis:
+    enabled: false
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    timeout: 60000ms
+
+# Encryption Configuration
+jasypt:
+  encryptor:
+    password: ${JASYPT_PASSWORD:springerp-secret}
+    algorithm: PBEWITHHMACSHA512ANDAES_256
+
+# Logging Configuration
 logging:
   level:
+    root: INFO
+    com.springerp: DEBUG
+    org.springframework.web: INFO
+    org.springframework.security: DEBUG
     org.springframework.cache: DEBUG
-    org.springframework.jdbc: DEBUG
-    org.hibernate.SQL: WARN
+    org.hibernate: WARN
+    org.hibernate.SQL: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/springerp.log
+    max-size: 10MB
+    max-history: 30
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus,info
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# OpenAPI/Swagger Configuration
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
+
+  quartz:
+    job-store-type: memory
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: springerpScheduler
+          threadPool:
+            threadCount: 5

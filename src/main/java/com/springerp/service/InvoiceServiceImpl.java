@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@Transactional
 public class InvoiceServiceImpl implements InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
@@ -37,6 +36,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @Transactional
     public InvoiceDTO createInvoice(Long companyId, InvoiceDTO invoiceDTO) {
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Company not found with id: " + companyId));
@@ -53,6 +53,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @Transactional
     public InvoiceDTO updateInvoice(Long companyId, Long id, InvoiceDTO invoiceDTO) {
         Invoice existingInvoice = invoiceRepository.findByCompanyIdAndId(companyId, id)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice not found with id: " + id));
@@ -65,6 +66,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public InvoiceDTO getInvoiceById(Long companyId, Long id) {
         Invoice invoice = invoiceRepository.findByCompanyIdAndId(companyId, id)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice not found with id: " + id));
@@ -72,6 +74,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<InvoiceDTO> getAllInvoices(Long companyId, Pageable pageable) {
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Company not found with id: " + companyId));
@@ -80,6 +83,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @Transactional
     public void deleteInvoice(Long companyId, Long id) {
         Invoice invoice = invoiceRepository.findByCompanyIdAndId(companyId, id)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice not found with id: " + id));
@@ -87,6 +91,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<InvoiceDTO> getInvoicesByStatus(Long companyId, InvoiceStatus status) {
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Company not found with id: " + companyId));
@@ -97,6 +102,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @Transactional
     public InvoiceDTO updateInvoiceStatus(Long companyId, Long id, InvoiceStatus status) {
         Invoice invoice = invoiceRepository.findByCompanyIdAndId(companyId, id)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice not found with id: " + id));
@@ -107,6 +113,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<InvoiceDTO> getInvoicesByCustomer(Long companyId, Long customerId) {
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Company not found with id: " + companyId));
@@ -117,6 +124,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<InvoiceDTO> getInvoicesByOrder(Long companyId, Long orderId) {
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Company not found with id: " + companyId));
@@ -128,8 +136,9 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public byte[] generateInvoicePdf(Long companyId, Long id) {
-        // Implement PDF generation logic here
-        throw new UnsupportedOperationException("PDF generation not implemented yet");
+        // PDF generation is not yet implemented - throws UnsupportedOperationException
+        // which is handled by GlobalExceptionHandler returning HTTP 501
+        throw new UnsupportedOperationException("PDF generation is not yet implemented");
     }
 
     private String generateInvoiceNumber(Long companyId) {
@@ -137,6 +146,12 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     private void calculateTotals(Invoice invoice) {
+        if (invoice.getItems() == null || invoice.getItems().isEmpty()) {
+            invoice.setSubtotal(BigDecimal.ZERO);
+            invoice.setTaxAmount(BigDecimal.ZERO);
+            invoice.setTotalAmount(BigDecimal.ZERO);
+            return;
+        }
         BigDecimal subtotal = invoice.getItems().stream()
                 .map(InvoiceItem::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -149,3 +164,4 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoice.setTotalAmount(totalAmount);
     }
 }
+

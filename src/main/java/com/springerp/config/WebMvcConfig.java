@@ -5,6 +5,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ * Web MVC configuration.
+ * Registers CompanyHeaderInterceptor for all API paths to enforce multi-tenancy.
+ */
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
@@ -17,6 +21,14 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(companyHeaderInterceptor)
-                .addPathPatterns("/api/v1/invoices/**");
+                .addPathPatterns("/api/**", "/invoices/**", "/customers/**",
+                        "/suppliers/**", "/products/**", "/categories/**", "/user/**")
+                .excludePathPatterns(
+                        "/auth/**",
+                        "/api/v1/auth/**",
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/admin/**"
+                );
     }
 }

@@ -11,12 +11,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Controller for password reset flow.
+ * Note: context-path /api/v1 is already configured in application properties,
+ * so this controller is accessible at /api/v1/auth/forgot-password and /api/v1/auth/reset-password.
+ */
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/auth")
 @Validated
 @Slf4j
 public class PasswordResetController {
-    
+
     private final PasswordResetService passwordResetService;
 
     public PasswordResetController(PasswordResetService passwordResetService) {
@@ -28,14 +33,12 @@ public class PasswordResetController {
             @Valid @RequestBody ForgotPasswordRequest request) {
         try {
             passwordResetService.processForgotPasswordRequest(request);
-            return ResponseEntity.ok(new ApiResponse(true, 
-                "If the email exists in our system, you will receive a password reset link"));
         } catch (Exception e) {
             log.error("Error processing forgot password request", e);
-            // Don't expose it whether the email exists or not
-            return ResponseEntity.ok(new ApiResponse(true, 
-                "If the email exists in our system, you will receive a password reset link"));
         }
+        // Always return success to avoid exposing whether email exists (security best practice)
+        return ResponseEntity.ok(new ApiResponse(true,
+            "If the email exists in our system, you will receive a password reset link"));
     }
 
     @PostMapping("/reset-password")
@@ -50,7 +53,7 @@ public class PasswordResetController {
         } catch (Exception e) {
             log.error("Error resetting password", e);
             return ResponseEntity.internalServerError()
-                .body(new ApiResponse(false, "Error resetting password"));
+                .body(new ApiResponse(false, "Error resetting password. Please try again."));
         }
     }
 }

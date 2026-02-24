@@ -1,31 +1,36 @@
 package com.springerp.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Invoice entity. Audit fields (createdAt, updatedAt, isDeleted) are inherited from BaseEntity.
+ */
 @Entity
-@Data
+@Table(name = "invoices")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Invoice {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Invoice extends BaseEntity {
 
+    @NotNull(message = "Company is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false)
     private Company company;
 
-    @Column(name = "invoice_number", unique = true, nullable = false)
+    @Column(name = "invoice_number", unique = true, nullable = false, length = 50)
     private String invoiceNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -36,13 +41,16 @@ public class Invoice {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    @Column(nullable = false)
+    @NotNull(message = "Invoice date is required")
+    @Column(name = "invoice_date", nullable = false)
     private LocalDateTime invoiceDate;
 
+    @Column(name = "due_date")
     private LocalDateTime dueDate;
 
+    @NotNull(message = "Status is required")
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private InvoiceStatus status;
 
     @Column(precision = 19, scale = 2)
@@ -54,34 +62,32 @@ public class Invoice {
     @Column(name = "total_amount", precision = 19, scale = 2)
     private BigDecimal totalAmount;
 
+    @Column(name = "billing_address", length = 255)
     private String billingAddress;
+
+    @Column(name = "shipping_address", length = 255)
     private String shippingAddress;
 
+    @Column(name = "payment_terms", length = 100)
     private String paymentTerms;
+
+    @Column(length = 500)
     private String notes;
 
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InvoiceItem> items = new ArrayList<>();
 
+    /**
+     * The user who created this invoice (distinct from BaseEntity.createdBy which stores username string).
+     */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by")
-    private User createdBy;
+    @JoinColumn(name = "created_by_user_id")
+    private User createdByUser;
 
+    /**
+     * The user who last updated this invoice.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "updated_by")
-    private User updatedBy;
-
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
+    @JoinColumn(name = "updated_by_user_id")
+    private User updatedByUser;
 }

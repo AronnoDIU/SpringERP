@@ -2,6 +2,7 @@ package com.springerp.security;
 
 import com.springerp.util.JwtTokenUtil;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,13 +46,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             try {
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);
             } catch (IllegalArgumentException e) {
-                logger.error("Unable to get JWT Token");
+                logger.debug("Unable to get JWT Token from request to " + request.getRequestURI());
             } catch (ExpiredJwtException e) {
-                logger.error("JWT Token has expired");
+                logger.debug("JWT Token has expired for request to " + request.getRequestURI());
+            } catch (JwtException e) {
+                logger.debug("Invalid JWT Token for request to " + request.getRequestURI());
             }
-        } else {
-            logger.warn("JWT Token does not begin with Bearer String");
         }
+        // No warning for missing Bearer token - many public endpoints don't require it
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);

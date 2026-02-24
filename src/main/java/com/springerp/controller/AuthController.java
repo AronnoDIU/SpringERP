@@ -1,16 +1,14 @@
 package com.springerp.controller;
 
 import com.springerp.dto.LoginRequest;
-import com.springerp.entity.ErrorObject;
 import com.springerp.entity.JwtResponse;
 import com.springerp.entity.User;
+import com.springerp.exception.ErrorResponse;
 import com.springerp.service.UserService;
 import com.springerp.util.JwtTokenUtil;
-import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,86 +17,74 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Date;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
+@Slf4j
 public class AuthController {
-
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
 
-    @Autowired
     public AuthController(
             UserService userService,
             AuthenticationManager authenticationManager,
-            JwtTokenUtil jwtTokenUtil
-    ) {
+            JwtTokenUtil jwtTokenUtil) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtTokenUtil = jwtTokenUtil;
     }
 
+    /**
+     * Registers a new user. The raw User entity is used here for simplicity;
+     * the password is encoded in UserServiceImpl before persistence.
+     */
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@Valid @RequestBody User user) {
-        if (user.getPassword() == null) {
-            return ResponseEntity.status(400).body(null);
-        }
         User createdUser = userService.createUser(user);
-        return ResponseEntity.status(201).body(createdUser);
+        // Don't return the password in the response
+        createdUser.setPassword(null);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
         try {
-            logger.info("Attempting to authenticate user: {}", loginRequest.getEmail());
-            
+            log.info("Attempting to authenticate user: {}", loginRequest.getEmail());
+
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.getEmail(),
                             loginRequest.getPassword()
                     )
             );
-            
-            logger.info("User authenticated successfully: {}", loginRequest.getEmail());
+
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            
-            // Get UserDetails from the authentication object
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            logger.info("UserDetails loaded: {}", userDetails.getUsername());
-            
-            // Generate JWT token using the username
             String token = jwtTokenUtil.generateToken(userDetails.getUsername());
-            logger.info("JWT token generated successfully");
-            
-            return ResponseEntity.ok()
-                    .body(new JwtResponse(token));
+
+            log.info("User authenticated successfully: {}", loginRequest.getEmail());
+            return ResponseEntity.ok(new JwtResponse(token));
         } catch (BadCredentialsException e) {
-            logger.error("Authentication failed for user: {}", loginRequest.getEmail(), e);
+            log.warn("Authentication failed for user: {}", loginRequest.getEmail());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorObject(HttpStatus.UNAUTHORIZED.value(), "Invalid email or password", new Date()));
+                    .body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Invalid email or password"));
         } catch (Exception e) {
-            logger.error("Error during authentication for user: {}", loginRequest.getEmail(), e);
+            log.error("Unexpected error during authentication for user: {}", loginRequest.getEmail(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ErrorObject(HttpStatus.INTERNAL_SERVER_ERROR.value(), 
-                            "An error occurred during authentication: " + e.getMessage(), new Date()));
+                    .body(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                            "An error occurred during authentication. Please try again later."));
         }
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logoutUser(HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);
-            jwtTokenUtil.invalidateToken(token); // Invalidate the token
+    public ResponseEntity<String> logoutUser(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            jwtTokenUtil.invalidateToken(token);
         }
         SecurityContextHolder.clearContext();
         return ResponseEntity.ok("User logged out successfully.");
@@ -106,18 +92,18 @@ public class AuthController {
 
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
             if (jwtTokenUtil.isTokenExpired(token)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(new ErrorObject(HttpStatus.UNAUTHORIZED.value(), "Token has expired", new Date()));
+                        .body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Token has expired"));
             }
             String username = jwtTokenUtil.getUsernameFromToken(token);
             String newToken = jwtTokenUtil.generateToken(username);
             return ResponseEntity.ok(new JwtResponse(newToken));
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorObject(HttpStatus.BAD_REQUEST.value(), "Invalid token", new Date()));
+                .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Invalid token"));
     }
 }

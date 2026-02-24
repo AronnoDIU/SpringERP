@@ -9,14 +9,24 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import java.util.HashSet;
-import java.util.Set;
 
+/**
+ * Utility class for JWT token operations.
+ * Uses a thread-safe ConcurrentHashMap with expiry timestamps for the token blacklist.
+ */
 @Component
 public class JwtTokenUtil {
-    private final Set<String> invalidatedTokens = new HashSet<>();
+
+    /**
+     * Thread-safe token blacklist: token -> expiry timestamp (epoch ms).
+     * Expired entries are lazily evicted on isTokenInvalidated checks.
+     */
+    private final ConcurrentHashMap<String, Long> invalidatedTokens = new ConcurrentHashMap<>();
 
     @Value("${app.jwt.expiration-milliseconds}")
     private long jwtExpirationMs;
@@ -31,7 +41,6 @@ public class JwtTokenUtil {
 
     public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
-
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)
@@ -59,20 +68,60 @@ public class JwtTokenUtil {
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
-        final String username = getUsernameFromToken(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token) && !isTokenInvalidated(token));
+        try {
+            final String username = getUsernameFromToken(token);
+            return username.equals(userDetails.getUsername())
+                    && !isTokenExpired(token)
+                    && !isTokenInvalidated(token);
+        } catch (io.jsonwebtoken.JwtException e) {
+            return false;
+        }
     }
 
     public boolean isTokenExpired(String token) {
-        final Date expiration = getExpirationDateFromToken(token);
-        return expiration.before(new Date());
+        try {
+            return getExpirationDateFromToken(token).before(new Date());
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            return true;
+        }
     }
 
+    /**
+     * Adds token to the blacklist with its natural expiry time.
+     * Tokens are automatically considered clean after their expiry.
+     */
     public void invalidateToken(String token) {
-        invalidatedTokens.add(token);
+        try {
+            Date expiry = getExpirationDateFromToken(token);
+            invalidatedTokens.put(token, expiry.getTime());
+        } catch (Exception e) {
+            // If we can't parse the token, store it with current time + expiration window
+            invalidatedTokens.put(token, System.currentTimeMillis() + jwtExpirationMs);
+        }
+        evictExpiredTokens();
     }
 
+    /**
+     * Checks if a token has been explicitly invalidated (e.g., logout).
+     * Lazily evicts expired entries to prevent unbounded memory growth.
+     */
     public boolean isTokenInvalidated(String token) {
-        return invalidatedTokens.contains(token);
+        Long expiryMs = invalidatedTokens.get(token);
+        if (expiryMs == null) {
+            return false;
+        }
+        if (System.currentTimeMillis() > expiryMs) {
+            invalidatedTokens.remove(token);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Removes all blacklist entries whose natural expiry has passed.
+     */
+    private void evictExpiredTokens() {
+        long now = System.currentTimeMillis();
+        invalidatedTokens.entrySet().removeIf(entry -> now > entry.getValue());
     }
 }
