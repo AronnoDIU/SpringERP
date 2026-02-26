@@ -175,9 +175,9 @@ public class CompanyManagementServiceImpl implements CompanyManagementService {
 
     @Override
     public String getCompanyConfig(Long companyId) {
-        return companyRepository.findById(companyId)
-                .map(Company::getConfig)
+        Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new RuntimeException("Company not found: " + companyId));
+        return company.getConfig();
     }
 
     @Override

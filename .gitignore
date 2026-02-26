@@ -1,7 +1,16 @@
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# ─── Root-level ignores ────────────────────────────────────────────────────────
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/nbdist/
+/.nb-gradle/
 
 ### STS ###
 .apt_generated
@@ -12,22 +21,23 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
 ### VS Code ###
 .vscode/
+
+### Environment files ###
 .env
+.env.local
+.env.*.local
+
+### OS ###
+.DS_Store
+Thumbs.db
+
+### Logs ###
+*.log
+logs/
+npm-debug.log*
+
+# Each subproject (backend/, frontend/) has its own .gitignore
+# for build artifacts (target/, node_modules/, dist/, etc.)
+

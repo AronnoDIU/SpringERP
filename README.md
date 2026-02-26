@@ -1,4 +1,179 @@
-# SpringERP
+# SpringERP — Enterprise Resource Planning System
+
+A full-stack, industry-standard ERP system built with **Spring Boot** (backend) and **React + TypeScript** (frontend), organized as a monorepo.
+
+---
+
+## Project Structure
+
+```
+SpringERP/
+├── backend/                       ← Spring Boot Application (Java 17)
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/com/springerp/
+│   │   │   │   ├── config/        # Security, CORS, Cache, Rate-Limiting, OpenAPI
+│   │   │   │   ├── context/       # Multi-tenancy / Company context holders
+│   │   │   │   ├── controller/    # REST API endpoints
+│   │   │   │   ├── dto/           # Data Transfer Objects
+│   │   │   │   ├── entity/        # JPA Entities
+│   │   │   │   ├── exception/     # Custom exceptions & global handler
+│   │   │   │   ├── repository/    # Spring Data JPA repositories
+│   │   │   │   ├── security/      # JWT filter, UserDetailsService
+│   │   │   │   ├── service/       # Business logic (interfaces + impls)
+│   │   │   │   └── util/          # JWT utilities, helpers
+│   │   │   └── resources/
+│   │   │       ├── application.yml
+│   │   │       ├── application-prod.properties
+│   │   │       └── db/migration/  # Flyway SQL migrations
+│   │   └── test/                  # Unit tests (JUnit 5 + Mockito)
+│   ├── Dockerfile
+│   ├── pom.xml
+│   └── .gitignore
+│
+├── frontend/                      ← React + TypeScript (Vite)
+│   ├── src/
+│   │   ├── api/                   # Axios service layer
+│   │   ├── components/
+│   │   │   ├── common/            # Reusable UI: Button, Table, Modal, Badge…
+│   │   │   └── layout/            # Sidebar, Topbar, AppLayout
+│   │   ├── features/              # Domain pages
+│   │   │   ├── auth/              # Login
+│   │   │   ├── dashboard/
+│   │   │   ├── customers/
+│   │   │   ├── suppliers/
+│   │   │   ├── products/
+│   │   │   ├── invoices/
+│   │   │   ├── employees/
+│   │   │   ├── accounting/
+│   │   │   └── inventory/         # ← NEW: Inventory management
+│   │   ├── hooks/                 # Custom React Query hooks
+│   │   ├── store/                 # Zustand auth store
+│   │   ├── types/                 # Shared TypeScript interfaces
+│   │   └── App.tsx
+│   ├── Dockerfile.frontend
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── .gitignore
+│
+├── .github/
+│   └── workflows/
+│       └── ci-cd.yml              # CI/CD: test → build → Docker push
+├── docker-compose.yml             # Orchestrate DB + Backend + Frontend
+├── .env.example
+└── README.md
+```
+
+---
+
+## Technology Stack
+
+| Layer      | Technology                                       |
+|------------|--------------------------------------------------|
+| Backend    | Java 17, Spring Boot 3.2, Spring Security, JWT   |
+| ORM        | Spring Data JPA, Hibernate, Flyway migrations    |
+| Database   | MySQL 8.0                                        |
+| Cache      | Caffeine (local), Redis-ready                    |
+| Docs       | SpringDoc OpenAPI (Swagger UI)                   |
+| Frontend   | React 18, TypeScript, Vite                       |
+| UI         | Tailwind CSS                                     |
+| State      | Zustand (auth), TanStack Query (server state)    |
+| Forms      | React Hook Form + Zod validation                 |
+| HTTP       | Axios                                            |
+| Container  | Docker, Docker Compose                           |
+| CI/CD      | GitHub Actions                                   |
+
+---
+
+## Quick Start
+
+### Prerequisites
+- Java 17+
+- Node.js 18+
+- Docker & Docker Compose
+- Maven 3.9+
+
+### 1. Clone & configure
+```bash
+git clone <repo-url>
+cd SpringERP
+cp .env.example .env
+# Edit .env with your secrets
+```
+
+### 2. Run with Docker (recommended)
+```bash
+docker-compose up --build
+```
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8080/api/v1
+- Swagger UI: http://localhost:8080/api/v1/swagger-ui.html
+
+### 3. Run locally
+
+**Backend:**
+```bash
+cd backend
+mvn spring-boot:run
+```
+
+**Frontend:**
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
+## API Modules
+
+| Module       | Base Path              |
+|--------------|------------------------|
+| Auth         | `/api/v1/auth`         |
+| Customers    | `/api/v1/customers`    |
+| Suppliers    | `/api/v1/suppliers`    |
+| Products     | `/api/v1/products`     |
+| Invoices     | `/api/v1/invoices`     |
+| Employees    | `/api/v1/employees`    |
+| Accounting   | `/api/v1/accounting`   |
+| Inventory    | `/api/v1/inventory`    |
+| Companies    | `/api/v1/admin/companies` |
+
+---
+
+## Running Tests
+
+```bash
+# Backend unit tests
+cd backend
+mvn test
+
+# Frontend type check
+cd frontend
+npx tsc --noEmit
+npm run build
+```
+
+---
+
+## Environment Variables
+
+See `.env.example` for all required variables.
+
+| Variable          | Description                      |
+|-------------------|----------------------------------|
+| `MYSQL_URL`       | JDBC connection string           |
+| `MYSQL_USERNAME`  | Database username                |
+| `MYSQL_PASSWORD`  | Database password                |
+| `JWT_SECRET`      | 64+ char secret for JWT signing  |
+| `VITE_API_BASE_URL` | Frontend API base URL          |
+
+---
+
+## License
+MIT
+
 
 `SpringERP` is a Java-based enterprise resource planning (ERP) system designed to manage and automate various business processes. It leverages the Spring Framework to provide a robust, scalable, and modular architecture, enabling seamless integration with other systems and easy customization to meet specific business needs.
 
