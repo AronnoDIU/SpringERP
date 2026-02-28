@@ -181,12 +181,7 @@
             <artifactId>spring-data-envers</artifactId>
         </dependency>
 
-        <!-- Schema Versioning -->
-        <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-        </dependency>
-
+        <!-- Schema Versioning — Flyway only -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>

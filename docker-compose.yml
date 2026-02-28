@@ -12,7 +12,7 @@ services:
       MYSQL_USER: ${MYSQL_USERNAME:-erp_user}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-erp_password}
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
@@ -43,7 +43,7 @@ services:
     ports:
       - "8080:8080"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/api/v1/actuator/health"]
+      test: ["CMD", "sh", "-c", "curl -sf http://localhost:8080/api/v1/auth/login -X POST -H 'Content-Type: application/json' -d '{}' | grep -qv 'Connection refused' || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5

@@ -1,76 +1,50 @@
 -- V1.2.0 - Performance and Security Indexes
--- Adds missing indexes on soft-delete columns and other high-traffic queries
--- for all main business tables.
+-- Adds indexes on high-traffic columns for all main business tables.
+-- Uses conditional INSERT ... SELECT to safely skip already-existing indexes.
 
--- ============================================================
--- Soft-delete indexes (is_deleted is queried on every read)
--- ============================================================
-CREATE INDEX IF NOT EXISTS idx_users_is_deleted ON users(is_deleted);
-CREATE INDEX IF NOT EXISTS idx_customers_is_deleted ON customers(is_deleted);
-CREATE INDEX IF NOT EXISTS idx_suppliers_is_deleted ON suppliers(is_deleted);
-CREATE INDEX IF NOT EXISTS idx_invoices_is_deleted ON invoices(is_deleted);
-CREATE INDEX IF NOT EXISTS idx_products_is_deleted ON products(is_deleted);
-CREATE INDEX IF NOT EXISTS idx_employees_is_deleted ON employees(is_deleted);
-CREATE INDEX IF NOT EXISTS idx_departments_is_deleted ON departments(is_deleted);
+-- Helper: add index only if it doesn't already exist
+-- Pattern: ALTER TABLE only when index not found in information_schema
+SET @db = DATABASE();
 
--- ============================================================
--- Customer indexes
--- ============================================================
-CREATE INDEX IF NOT EXISTS idx_customers_company_id ON customers(company_id);
-CREATE INDEX IF NOT EXISTS idx_customers_email ON customers(email);
-CREATE INDEX IF NOT EXISTS idx_customers_name ON customers(name);
+-- users
+SELECT COUNT(*) INTO @idx_exists FROM information_schema.statistics WHERE table_schema=@db AND table_name='users' AND index_name='idx_users_reset_token';
+SET @sql = IF(@idx_exists = 0, 'ALTER TABLE users ADD INDEX idx_users_reset_token (reset_password_token)', 'SELECT 1');
+PREPARE s FROM @sql; EXECUTE s; DEALLOCATE PREPARE s;
 
--- ============================================================
--- Supplier indexes
--- ============================================================
-CREATE INDEX IF NOT EXISTS idx_suppliers_email ON suppliers(email);
-CREATE INDEX IF NOT EXISTS idx_suppliers_name ON suppliers(name);
+-- customers
+SELECT COUNT(*) INTO @idx_exists FROM information_schema.statistics WHERE table_schema=@db AND table_name='customers' AND index_name='idx_customers_company_id';
+SET @sql = IF(@idx_exists = 0, 'ALTER TABLE customers ADD INDEX idx_customers_company_id (company_id)', 'SELECT 1');
+PREPARE s FROM @sql; EXECUTE s; DEALLOCATE PREPARE s;
 
--- ============================================================
--- Invoice indexes (critical for multi-tenancy performance)
--- ============================================================
-CREATE INDEX IF NOT EXISTS idx_invoices_company_id ON invoices(company_id);
-CREATE INDEX IF NOT EXISTS idx_invoices_customer_id ON invoices(customer_id);
-CREATE INDEX IF NOT EXISTS idx_invoices_order_id ON invoices(order_id);
-CREATE INDEX IF NOT EXISTS idx_invoices_status ON invoices(status);
-CREATE INDEX IF NOT EXISTS idx_invoices_invoice_date ON invoices(invoice_date);
-CREATE UNIQUE INDEX IF NOT EXISTS idx_invoices_invoice_number ON invoices(invoice_number);
+-- invoices
+SELECT COUNT(*) INTO @idx_exists FROM information_schema.statistics WHERE table_schema=@db AND table_name='invoices' AND index_name='idx_invoices_company_id';
+SET @sql = IF(@idx_exists = 0, 'ALTER TABLE invoices ADD INDEX idx_invoices_company_id (company_id)', 'SELECT 1');
+PREPARE s FROM @sql; EXECUTE s; DEALLOCATE PREPARE s;
 
--- ============================================================
--- Users indexes
--- ============================================================
-CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email);
-CREATE INDEX IF NOT EXISTS idx_users_reset_token ON users(reset_password_token);
-CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
+SELECT COUNT(*) INTO @idx_exists FROM information_schema.statistics WHERE table_schema=@db AND table_name='invoices' AND index_name='idx_invoices_customer_id';
+SET @sql = IF(@idx_exists = 0, 'ALTER TABLE invoices ADD INDEX idx_invoices_customer_id (customer_id)', 'SELECT 1');
+PREPARE s FROM @sql; EXECUTE s; DEALLOCATE PREPARE s;
 
--- ============================================================
--- Company_users composite index
--- ============================================================
-CREATE INDEX IF NOT EXISTS idx_company_users_user_company ON company_users(user_id, company_id);
+SELECT COUNT(*) INTO @idx_exists FROM information_schema.statistics WHERE table_schema=@db AND table_name='invoices' AND index_name='idx_invoices_invoice_date';
+SET @sql = IF(@idx_exists = 0, 'ALTER TABLE invoices ADD INDEX idx_invoices_invoice_date (invoice_date)', 'SELECT 1');
+PREPARE s FROM @sql; EXECUTE s; DEALLOCATE PREPARE s;
 
--- ============================================================
--- Product indexes
--- ============================================================
-CREATE INDEX IF NOT EXISTS idx_products_category_id ON products(category_id);
+-- company_users
+SELECT COUNT(*) INTO @idx_exists FROM information_schema.statistics WHERE table_schema=@db AND table_name='company_users' AND index_name='idx_company_users_user_company';
+SET @sql = IF(@idx_exists = 0, 'ALTER TABLE company_users ADD INDEX idx_company_users_user_company (user_id, company_id)', 'SELECT 1');
+PREPARE s FROM @sql; EXECUTE s; DEALLOCATE PREPARE s;
 
--- ============================================================
--- Journal entries indexes
--- ============================================================
-CREATE INDEX IF NOT EXISTS idx_journal_entries_date ON journal_entries(journal_date);
-CREATE INDEX IF NOT EXISTS idx_journal_entries_status ON journal_entries(status);
-CREATE INDEX IF NOT EXISTS idx_journal_entries_company_id ON journal_entries(company_id);
+-- journal_entries
+SELECT COUNT(*) INTO @idx_exists FROM information_schema.statistics WHERE table_schema=@db AND table_name='journal_entries' AND index_name='idx_journal_entries_company_id';
+SET @sql = IF(@idx_exists = 0, 'ALTER TABLE journal_entries ADD INDEX idx_journal_entries_company_id (company_id)', 'SELECT 1');
+PREPARE s FROM @sql; EXECUTE s; DEALLOCATE PREPARE s;
 
--- ============================================================
--- General ledger indexes
--- ============================================================
-CREATE INDEX IF NOT EXISTS idx_general_ledger_account_id ON general_ledger(account_id);
-CREATE INDEX IF NOT EXISTS idx_general_ledger_transaction_date ON general_ledger(transaction_date);
+-- general_ledger
+SELECT COUNT(*) INTO @idx_exists FROM information_schema.statistics WHERE table_schema=@db AND table_name='general_ledger' AND index_name='idx_general_ledger_account_id';
+SET @sql = IF(@idx_exists = 0, 'ALTER TABLE general_ledger ADD INDEX idx_general_ledger_account_id (account_id)', 'SELECT 1');
+PREPARE s FROM @sql; EXECUTE s; DEALLOCATE PREPARE s;
 
--- ============================================================
--- Employee indexes
--- ============================================================
-CREATE INDEX IF NOT EXISTS idx_employees_department_id ON employees(department_id);
-CREATE INDEX IF NOT EXISTS idx_employees_employment_status ON employees(employment_status);
-CREATE UNIQUE INDEX IF NOT EXISTS idx_employees_employee_id ON employees(employee_id);
-CREATE UNIQUE INDEX IF NOT EXISTS idx_employees_email ON employees(email);
-
+-- employees
+SELECT COUNT(*) INTO @idx_exists FROM information_schema.statistics WHERE table_schema=@db AND table_name='employees' AND index_name='idx_employees_company_id';
+SET @sql = IF(@idx_exists = 0, 'ALTER TABLE employees ADD INDEX idx_employees_company_id (company_id)', 'SELECT 1');
+PREPARE s FROM @sql; EXECUTE s; DEALLOCATE PREPARE s;
