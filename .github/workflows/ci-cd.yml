@@ -93,7 +93,7 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository }}/backend:latest
+          tags: ghcr.io/aronnodiu/springerp/backend:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -103,7 +103,7 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile.frontend
           push: true
-          tags: ghcr.io/${{ github.repository }}/frontend:latest
+          tags: ghcr.io/aronnodiu/springerp/frontend:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
