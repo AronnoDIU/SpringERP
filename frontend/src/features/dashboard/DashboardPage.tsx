@@ -1,201 +1,154 @@
 import React from 'react';
-import {
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-} from 'recharts';
-import { StatCard } from '../../components/common/StatCard';
-import { useCustomers } from '../../hooks/useCustomers';
-import { useSuppliers } from '../../hooks/useSuppliers';
-import { useProducts } from '../../hooks/useProducts';
-import { useInvoices } from '../../hooks/useInvoices';
-import { useEmployees } from '../../hooks/useEmployees';
+import { Icons } from '../../components/Icons';
+import { useAuthStore } from '../../store/auth.store';
 
-const revenueData = [
-  { month: 'Aug', revenue: 42000, expenses: 28000 },
-  { month: 'Sep', revenue: 55000, expenses: 32000 },
-  { month: 'Oct', revenue: 48000, expenses: 30000 },
-  { month: 'Nov', revenue: 61000, expenses: 35000 },
-  { month: 'Dec', revenue: 73000, expenses: 41000 },
-  { month: 'Jan', revenue: 58000, expenses: 33000 },
-  { month: 'Feb', revenue: 67000, expenses: 38000 },
-];
+// We inline the Company type for safety, or use existing from types if available
+interface Company {
+  id: string | number;
+  name: string;
+}
 
 export const DashboardPage: React.FC = () => {
-  const { data: customers } = useCustomers();
-  const { data: suppliers } = useSuppliers();
-  const { data: products } = useProducts();
-  const { data: invoices } = useInvoices(0, 100);
-  const { data: employees } = useEmployees();
-
-  const totalInvoices = invoices?.totalElements ?? 0;
-  const pendingInvoices = invoices?.content?.filter((i) => i.status === 'PENDING').length ?? 0;
-  const overdueInvoices = invoices?.content?.filter((i) => i.status === 'OVERDUE').length ?? 0;
-  const totalRevenue = invoices?.content
-    ?.filter((i) => i.status === 'PAID')
-    .reduce((sum, i) => sum + (i.totalAmount ?? 0), 0) ?? 0;
+  const { user } = useAuthStore();
+  
+  // Use user's company information if available, otherwise fallback to default
+  const company: Company = {
+    id: 'CORE-SYN',
+    name: 'Spring ERP',
+    // You can swap this with real user.company data if it exists in your schema
+  };
 
   return (
-    <div className="space-y-6">
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Total Revenue"
-          value={`$${totalRevenue.toLocaleString()}`}
-          color="blue"
-          trend={{ value: 12.5, label: 'vs last month' }}
-          icon={
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-            </svg>
-          }
-        />
-        <StatCard
-          title="Total Customers"
-          value={customers?.length ?? 0}
-          color="green"
-          trend={{ value: 8.2, label: 'vs last month' }}
-          icon={
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          }
-        />
-        <StatCard
-          title="Total Invoices"
-          value={totalInvoices}
-          color="purple"
-          icon={
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          }
-        />
-        <StatCard
-          title="Total Employees"
-          value={employees?.length ?? 0}
-          color="yellow"
-          icon={
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-          }
-        />
-      </div>
+    <div className="space-y-14 pb-14">
+      
+      {/* Strategic Command Hero - $50M Standard */}
+      <section className="relative h-[650px] w-full rounded-[4.5rem] overflow-hidden border border-slate-200 dark:border-white/5 shadow-[0_40px_100px_-30px_rgba(0,0,0,0.15)] dark:shadow-[0_40px_100px_-30px_rgba(0,0,0,0.8)] bg-slate-100 dark:bg-slate-950 group animate-fade-up">
+        {/* Dynamic Multi-layered Environment */}
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 via-slate-50 to-purple-50 dark:from-[#0a0f1e] dark:via-[#05070a] dark:to-[#120a1e]"></div>
+        <div className="absolute top-[-25%] right-[-10%] w-[900px] h-[900px] bg-indigo-500/10 dark:bg-indigo-600/10 rounded-full blur-[180px] animate-pulse-slow"></div>
+        <div className="absolute bottom-[-15%] left-[-10%] w-[700px] h-[700px] bg-purple-500/5 dark:bg-purple-600/10 rounded-full blur-[150px]"></div>
+        <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_79px,rgba(99,102,241,0.05)_80px)] opacity-[0.4] pointer-events-none"></div>
+        
+        {/* Horizon Line Accent */}
+        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-indigo-600/30 dark:via-indigo-500/20 to-transparent"></div>
+        
+        <div className="relative z-10 grid lg:grid-cols-5 h-full items-center px-16 md:px-28">
+          <div className="lg:col-span-3 space-y-12">
+            <div className="inline-flex items-center gap-3.5 px-6 py-3 rounded-2xl glass border-slate-300 dark:border-indigo-500/10 text-indigo-700 dark:text-indigo-300 text-[11px] font-black uppercase tracking-[0.5em] shadow-sm">
+              <span className="flex h-3 w-3 relative">
+                <span className="animate-ping absolute h-full w-full rounded-full bg-indigo-500 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-indigo-600 dark:bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,1)]"></span>
+              </span>
+              ACTIVE NODE: {company.id} [VERIFIED]
+            </div>
+            
+            <div className="space-y-8">
+              <h1 className="text-8xl md:text-[9rem] font-black tracking-tighter text-slate-950 dark:text-white leading-[0.75] mb-4">
+                {company.name.split(' ')[0]} <br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 via-slate-500 to-indigo-950 dark:from-indigo-300 dark:via-white dark:to-indigo-700 text-glow-indigo">Nexus OS.</span>
+              </h1>
+              <p className="text-2xl text-slate-600 dark:text-slate-400 font-light max-w-2xl leading-relaxed">
+                Autonomous orchestration of global strategic assets for <span className="font-bold text-slate-900 dark:text-slate-100">{company.name}</span>. <br/>
+                <span className="text-slate-800 dark:text-slate-500 font-bold uppercase tracking-[0.3em] text-xs">Mission-Critical Intelligence at Scale.</span>
+              </p>
+            </div>
 
-      {/* Second row */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard
-          title="Pending Invoices"
-          value={pendingInvoices}
-          color="yellow"
-          icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3" /><circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth={1.5} /></svg>}
-        />
-        <StatCard
-          title="Overdue Invoices"
-          value={overdueInvoices}
-          color="red"
-          icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>}
-        />
-        <StatCard
-          title="Total Products"
-          value={products?.length ?? 0}
-          color="blue"
-          icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" /></svg>}
-        />
-      </div>
+            <div className="flex gap-8">
+               <button className="bg-slate-950 dark:bg-white text-white dark:text-slate-950 px-16 py-6 rounded-[2.5rem] font-black text-base hover:-translate-y-2 transition-all shadow-2xl active:scale-95 shadow-indigo-500/10">
+                  Initialize Operations
+               </button>
+               <button className="glass border-slate-300 dark:border-white/10 px-12 py-6 rounded-[2.5rem] font-bold text-base text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-all active:scale-95 shadow-sm">
+                  Strategic Matrix
+               </button>
+            </div>
+          </div>
 
-      {/* Revenue Chart */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <h2 className="text-base font-semibold text-gray-800 mb-4">Revenue vs Expenses (Last 7 Months)</h2>
-        <ResponsiveContainer width="100%" height={280}>
-          <AreaChart data={revenueData}>
-            <defs>
-              <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} />
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#ef4444" stopOpacity={0.15} />
-                <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis dataKey="month" tick={{ fontSize: 12 }} tickLine={false} />
-            <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false}
-              tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
-            <Tooltip formatter={(value: number) => [`$${value.toLocaleString()}`, '']} />
-            <Area type="monotone" dataKey="revenue" name="Revenue" stroke="#3b82f6" strokeWidth={2}
-              fill="url(#colorRevenue)" />
-            <Area type="monotone" dataKey="expenses" name="Expenses" stroke="#ef4444" strokeWidth={2}
-              fill="url(#colorExpenses)" />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Bottom row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Recent Invoices */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <h2 className="text-base font-semibold text-gray-800 mb-4">Recent Invoices</h2>
-          <div className="space-y-3">
-            {(invoices?.content ?? []).slice(0, 5).map((inv) => (
-              <div key={inv.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-                <div>
-                  <p className="text-sm font-medium text-gray-700">{inv.invoiceNumber ?? `INV-${inv.id}`}</p>
-                  <p className="text-xs text-gray-400">{inv.customerName}</p>
+          <div className="lg:col-span-2 hidden lg:flex justify-end relative items-center h-full">
+             <div className="relative w-[500px] h-[500px] animate-[float_6s_ease-in-out_infinite]">
+                <div className="absolute -inset-20 bg-indigo-600/10 dark:bg-indigo-500/10 blur-[120px] rounded-full"></div>
+                
+                {/* Tactical Parallax Panes */}
+                <div className="glass absolute -top-14 right-0 p-12 rounded-[4rem] border-slate-300 dark:border-white/20 shadow-2xl z-20 w-80 rotate-3 group-hover:rotate-0 transition-all duration-1000">
+                   <div className="flex justify-between items-center mb-12">
+                      <div className="p-5 bg-indigo-600/10 dark:bg-indigo-500/10 rounded-3xl text-indigo-700 dark:text-indigo-300"><Icons.Finance size={32}/></div>
+                      <span className="text-[11px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-xl">+18.4%</span>
+                   </div>
+                   <p className="text-[11px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.4em] mb-2">Portfolio Delta</p>
+                   <h4 className="text-4xl font-black text-slate-950 dark:text-white">$24.8B</h4>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-semibold text-gray-800">${(inv.totalAmount ?? 0).toLocaleString()}</p>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                    inv.status === 'PAID' ? 'bg-green-100 text-green-700' :
-                    inv.status === 'OVERDUE' ? 'bg-red-100 text-red-700' :
-                    'bg-yellow-100 text-yellow-700'
-                  }`}>{inv.status}</span>
+
+                <div className="glass absolute -bottom-12 -left-12 p-12 rounded-[4rem] border-slate-300 dark:border-white/20 shadow-2xl z-10 w-80 -rotate-6 group-hover:rotate-0 transition-all duration-1000">
+                   <div className="flex justify-between items-center mb-12">
+                      <div className="p-5 bg-purple-600/10 dark:bg-purple-500/10 rounded-3xl text-purple-700 dark:text-purple-300"><Icons.HR size={32}/></div>
+                   </div>
+                   <p className="text-[11px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.4em] mb-2">Managed Nodes</p>
+                   <h4 className="text-4xl font-black text-slate-950 dark:text-white">102.4k</h4>
                 </div>
-              </div>
-            ))}
-            {!invoices?.content?.length && (
-              <p className="text-sm text-gray-400 text-center py-4">No invoices yet</p>
-            )}
+                
+                <div className="absolute inset-0 border border-indigo-600/10 dark:border-indigo-500/10 rounded-full animate-[spin_15s_linear_infinite] opacity-30"></div>
+                <div className="absolute inset-14 border border-dashed border-indigo-600/20 dark:border-indigo-500/20 rounded-full animate-[spin_20s_linear_infinite_reverse] opacity-30"></div>
+             </div>
           </div>
         </div>
+      </section>
 
-        {/* Quick Stats */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <h2 className="text-base font-semibold text-gray-800 mb-4">Quick Overview</h2>
-          <div className="space-y-4">
-            {[
-              { label: 'Customers', value: customers?.length ?? 0, max: 200, color: 'bg-blue-500' },
-              { label: 'Suppliers', value: suppliers?.length ?? 0, max: 100, color: 'bg-green-500' },
-              { label: 'Products', value: products?.length ?? 0, max: 500, color: 'bg-purple-500' },
-              { label: 'Employees', value: employees?.length ?? 0, max: 300, color: 'bg-yellow-500' },
-            ].map((item) => (
-              <div key={item.label}>
-                <div className="flex justify-between mb-1">
-                  <span className="text-sm text-gray-600">{item.label}</span>
-                  <span className="text-sm font-semibold text-gray-800">{item.value}</span>
+      {/* Operations Grid - Staggered Entry */}
+      <section className="space-y-12">
+        <div className="flex items-end justify-between px-6 opacity-0 animate-[fadeUp_0.8s_ease-out_0.2s_forwards]">
+          <div>
+             <h2 className="text-5xl font-black tracking-tighter text-slate-950 dark:text-white">Ops Spheres.</h2>
+             <p className="text-indigo-600 dark:text-indigo-500 font-black uppercase text-[11px] tracking-[0.6em] mt-4">Functional Module Interface</p>
+          </div>
+          <button className="glass border-slate-300 dark:border-white/5 px-8 py-3 rounded-2xl text-[11px] font-black uppercase tracking-[0.4em] text-slate-500 dark:text-slate-400 hover:text-indigo-700 dark:hover:text-white transition-all shadow-sm">Matrix View</button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+           {modules.map((m, i) => (
+             <div key={i} style={{ animationDelay: `${0.3 + (i * 0.1)}s` }} className="opacity-0 animate-[fadeUp_0.8s_ease-out_forwards] glass p-12 rounded-[4.5rem] border-slate-200 dark:border-white/5 hover:border-indigo-600/30 dark:hover:border-indigo-500/30 transition-all duration-1000 group/card cursor-pointer hover:shadow-2xl hover:-translate-y-5 relative overflow-hidden">
+                <div className={`w-24 h-24 rounded-[2.5rem] flex items-center justify-center mb-12 transition-transform duration-1000 group-hover/card:scale-110 group-hover/card:rotate-6 ${m.bg}`}>
+                   <m.icon size={40} className={m.color} />
                 </div>
-                <div className="w-full bg-gray-100 rounded-full h-2">
-                  <div
-                    className={`${item.color} h-2 rounded-full transition-all duration-500`}
-                    style={{ width: `${Math.min((item.value / item.max) * 100, 100)}%` }}
-                  />
+                <h3 className="text-3xl font-black mb-5 text-slate-950 dark:text-white group-hover/card:text-indigo-600 transition-colors">{m.title}</h3>
+                <p className="text-base text-slate-500 dark:text-slate-500 leading-relaxed font-medium mb-12">{m.desc}</p>
+                <div className="flex items-center gap-4 text-xs font-black uppercase tracking-[0.4em] text-indigo-700 translate-x-[-15px] opacity-0 group-hover/card:translate-x-0 group-hover/card:opacity-100 transition-all duration-700">
+                  Enter Sphere <Icons.ArrowRight size={22} />
                 </div>
+                <div className="absolute -right-10 -bottom-10 opacity-[0.03] group-hover/card:opacity-[0.08] transition-all duration-1000 group-hover/card:scale-125">
+                   <m.icon size={220} />
+                </div>
+             </div>
+           ))}
+        </div>
+      </section>
+
+      {/* Global Health Pulse Bar */}
+      <section className="opacity-0 animate-[fadeUp_0.8s_ease-out_0.6s_forwards] glass rounded-[5rem] p-16 flex flex-col md:flex-row items-center justify-between border-slate-200 dark:border-indigo-500/10 gap-16 group shadow-lg">
+         <div className="flex items-center gap-14">
+            <div className="w-28 h-28 rounded-[3.5rem] bg-emerald-500/5 flex items-center justify-center text-emerald-600 dark:text-emerald-400 border border-emerald-500/10 shadow-inner group-hover:scale-110 transition-transform duration-1000">
+               <Icons.Activity size={56} className="animate-pulse" />
+            </div>
+            <div className="space-y-2">
+               <h4 className="text-4xl font-black text-slate-950 dark:text-white tracking-tight">System Pulse.</h4>
+               <p className="text-slate-500 font-bold text-sm uppercase tracking-[0.4em]">Grid Integrity: <span className="text-emerald-500">100% Operational</span></p>
+            </div>
+         </div>
+         <div className="flex -space-x-8">
+            {[1,2,3,4,5,6,7].map(i => (
+              <div key={i} className="w-20 h-20 rounded-full glass border-2 border-slate-100 dark:border-slate-900 overflow-hidden flex items-center justify-center text-[11px] font-black text-indigo-700 dark:text-indigo-400 shadow-xl hover:-translate-y-5 transition-transform duration-700 cursor-pointer bg-slate-50 dark:bg-slate-950/50">
+                 GRID-{i}
               </div>
             ))}
-          </div>
-        </div>
-      </div>
+         </div>
+      </section>
     </div>
   );
 };
 
+const modules = [
+  { title: "Finance", icon: Icons.Finance, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-500/10", desc: "Predictive fiscal orchestration with synchronized quantum-ledgers." },
+  { title: "Logistics", icon: Icons.Truck, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-500/10", desc: "Autonomous global SCM nodes with zero-latency routing protocols." },
+  { title: "Personnel", icon: Icons.HR, color: "text-rose-600 dark:text-rose-400", bg: "bg-rose-500/10", desc: "Human capital orchestration with neural performance indexing." },
+  { title: "Factory", icon: Icons.Factory, color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-500/10", desc: "Precision shop-floor telemetry with automated resource loops." },
+];
+
+export default DashboardPage;

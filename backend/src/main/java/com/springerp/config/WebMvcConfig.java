@@ -21,14 +21,21 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(companyHeaderInterceptor)
-                .addPathPatterns("/api/**", "/invoices/**", "/customers/**",
-                        "/suppliers/**", "/products/**", "/categories/**", "/user/**")
+                .addPathPatterns("/invoices/**")
                 .excludePathPatterns(
                         "/auth/**",
                         "/api/v1/auth/**",
                         "/v3/api-docs/**",
                         "/swagger-ui/**",
-                        "/admin/**"
+                        "/admin/**",
+                        "/customers/**",
+                        "/suppliers/**",
+                        "/products/**",
+                        "/categories/**",
+                        "/employees/**",
+                        "/inventory/**",
+                        "/accounting/**",
+                        "/user/**"
                 );
     }
 }

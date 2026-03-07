@@ -88,40 +88,92 @@ SpringERP/
 ## Quick Start
 
 ### Prerequisites
-- Java 17+
-- Node.js 18+
-- Docker & Docker Compose
-- Maven 3.9+
+- Java 17 (OpenJDK 17 at `/usr/lib/jvm/java-17-openjdk-amd64`)
+- Node.js 18+ and npm
+- Maven 3.8+
 
-### 1. Clone & configure
+> **Note:** The system Java may be a newer version. The build scripts use Java 17 explicitly.
+
+---
+
+### ▶ Option 1 — One Command (Recommended)
+
 ```bash
-git clone <repo-url>
 cd SpringERP
-cp .env.example .env
-# Edit .env with your secrets
+./start.sh
 ```
 
-### 2. Run with Docker (recommended)
+This single script will:
+1. Build the Spring Boot jar (skipping tests)
+2. Start the backend on **port 8090**
+3. Start the Vite dev server on **port 3000**
+4. Print all URLs and credentials
+5. Shut down both services cleanly on `Ctrl+C`
+
+**URLs after startup:**
+
+| Service    | URL |
+|------------|-----|
+| Frontend   | http://localhost:3000 |
+| Backend API | http://localhost:8090/api/v1 |
+| Swagger UI | http://localhost:8090/api/v1/swagger-ui.html |
+| H2 Console | http://localhost:8090/api/v1/h2-console |
+
+**Default login:** `admin@springerp.com` / `Admin@123`
+
+---
+
+### ▶ Option 2 — Run Services Separately
+
+**Terminal 1 — Backend:**
 ```bash
+cd SpringERP/backend
+JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64 mvn package -DskipTests
+/usr/lib/jvm/java-17-openjdk-amd64/bin/java \
+  -jar target/spring-erp.jar \
+  --spring.profiles.active=local \
+  --server.port=8090 \
+  --jwt.secret=springerpsecretkeywith512bitsforhs512algorithm12345678901234 \
+  --app.jwt.expiration-milliseconds=86400000
+```
+
+**Terminal 2 — Frontend:**
+```bash
+cd SpringERP/frontend
+npm install          # first time only
+VITE_API_BASE_URL=http://localhost:8090/api/v1 npm run dev -- --port 3000
+```
+
+---
+
+### ▶ Option 3 — Docker Compose (MySQL production-like)
+
+```bash
+cd SpringERP
 docker-compose up --build
 ```
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8080/api/v1
 - Swagger UI: http://localhost:8080/api/v1/swagger-ui.html
 
-### 3. Run locally
+---
 
-**Backend:**
-```bash
-cd backend
-mvn spring-boot:run
-```
+### First-Time Setup (register admin user)
 
-**Frontend:**
+The local H2 database starts empty. Register the admin once:
 ```bash
-cd frontend
-npm install
-npm run dev
+curl -X POST http://localhost:8090/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firstName": "Admin",
+    "lastName": "User",
+    "email": "admin@springerp.com",
+    "password": "Admin@123",
+    "dateOfBirth": "1990-01-01",
+    "role": "ADMIN",
+    "phoneNumber": "0123456789",
+    "address": "123 Main Street"
+  }'
 ```
 
 ---

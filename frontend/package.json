@@ -16,6 +16,7 @@
     "@tanstack/react-query-devtools": "^4.36.1",
     "axios": "^1.6.7",
     "dayjs": "^1.11.10",
+    "lucide-react": "^0.577.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.50.1",

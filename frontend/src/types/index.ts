@@ -1,4 +1,5 @@
-// ─── Auth ────────────────────────────────────────────────────────────────────
+// ─── Auth ─────────────────────────────────────────────────────────────────────
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -10,13 +11,14 @@ export interface JwtResponse {
 
 export interface AuthUser {
   id: number;
-  username: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  roles: string[];
-  companyId?: number;
+  role: string;
 }
 
-// ─── Common ──────────────────────────────────────────────────────────────────
+// ─── Pagination ───────────────────────────────────────────────────────────────
+
 export interface PageResponse<T> {
   content: T[];
   totalElements: number;
@@ -27,52 +29,86 @@ export interface PageResponse<T> {
   last: boolean;
 }
 
-export interface ApiError {
-  status: number;
-  message: string;
-  timestamp?: string;
-  errors?: Record<string, string>;
+// ─── Company / Navigation (kept from original) ────────────────────────────────
+
+export interface Company {
+  id: string;
+  name: string;
+  industry: string;
+  color: string;
+  icon: string;
+  location: string;
+}
+
+export interface SubModule {
+  id: string;
+  label: string;
+  children?: { id: string; label: string }[];
+}
+
+export interface NavItem {
+  id: string;
+  label: string;
+  icon: any;
+  subModules: SubModule[];
 }
 
 // ─── Customer ─────────────────────────────────────────────────────────────────
+
 export interface Customer {
   id: number;
   firstName: string;
   lastName: string;
-  email: string;
+  name?: string;
+  email?: string;
   phone?: string;
   address?: string;
   city?: string;
   country?: string;
   companyName?: string;
   notes?: string;
+  stage?: string;
+  lastContact?: string;
+  value?: number;
   createdAt?: string;
   updatedAt?: string;
 }
 
-export type CreateCustomerRequest = Omit<Customer, 'id' | 'createdAt' | 'updatedAt'>;
+export interface CreateCustomerRequest {
+  firstName: string;
+  lastName: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  companyName?: string;
+  notes?: string;
+}
 
 // ─── Supplier ─────────────────────────────────────────────────────────────────
+
 export interface Supplier {
   id: number;
   name: string;
   email?: string;
   phone?: string;
   address?: string;
-  city?: string;
-  country?: string;
-  contactPerson?: string;
-  website?: string;
-  taxId?: string;
-  paymentTerms?: string;
-  notes?: string;
+  companyName?: string;
   createdAt?: string;
   updatedAt?: string;
 }
 
-export type CreateSupplierRequest = Omit<Supplier, 'id' | 'createdAt' | 'updatedAt'>;
+export interface CreateSupplierRequest {
+  name: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  companyName?: string;
+}
 
 // ─── Product ──────────────────────────────────────────────────────────────────
+
 export interface Product {
   id: number;
   name: string;
@@ -80,39 +116,84 @@ export interface Product {
   description?: string;
   price: number;
   costPrice?: number;
+  stock: number;
   stockQuantity?: number;
   unit?: string;
-  categoryId?: number;
-  categoryName?: string;
   taxRate?: number;
   isActive?: boolean;
+  categoryName?: string;
+  category?: { id: number; name: string };
   createdAt?: string;
   updatedAt?: string;
 }
 
-export type CreateProductRequest = Omit<Product, 'id' | 'createdAt' | 'updatedAt'>;
+export interface CreateProductRequest {
+  name: string;
+  sku?: string;
+  description?: string;
+  price: number;
+  costPrice?: number;
+  stock?: number;
+  stockQuantity?: number;
+  unit?: string;
+  taxRate?: number;
+  categoryId?: number;
+}
+
+// ─── Employee ─────────────────────────────────────────────────────────────────
+
+export type EmploymentStatus = 'ACTIVE' | 'ON_LEAVE' | 'RESIGNED' | 'TERMINATED';
+export type EmploymentType = 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'INTERN';
+
+export interface Employee {
+  id: number;
+  employeeId?: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  designation?: string;
+  department?: string;
+  employmentType?: EmploymentType;
+  employmentStatus?: EmploymentStatus;
+  dateOfJoining?: string;
+  baseSalary?: number;
+  officeLocation?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateEmployeeRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  designation?: string;
+  department?: string;
+  employmentType?: EmploymentType;
+  employmentStatus?: EmploymentStatus;
+  dateOfJoining?: string;
+  baseSalary?: number;
+  officeLocation?: string;
+}
 
 // ─── Invoice ──────────────────────────────────────────────────────────────────
+
 export type InvoiceStatus = 'DRAFT' | 'PENDING' | 'SENT' | 'PAID' | 'OVERDUE' | 'CANCELLED';
 
 export interface InvoiceItem {
   id?: number;
   productId?: number;
-  productName?: string;
   description?: string;
   quantity: number;
   unitPrice: number;
-  taxRate?: number;
-  totalPrice: number;
+  totalPrice?: number;
 }
 
 export interface Invoice {
   id: number;
-  companyId?: number;
-  companyName?: string;
   invoiceNumber?: string;
-  orderId?: number;
-  customerId: number;
+  customerId?: number;
   customerName?: string;
   invoiceDate: string;
   dueDate?: string;
@@ -125,56 +206,24 @@ export interface Invoice {
   paymentTerms?: string;
   notes?: string;
   items?: InvoiceItem[];
-  createdByUsername?: string;
   createdAt?: string;
   updatedAt?: string;
 }
 
-export type CreateInvoiceRequest = Omit<Invoice, 'id' | 'createdAt' | 'updatedAt' | 'createdByUsername' | 'companyName' | 'customerName' | 'invoiceNumber'>;
-
-// ─── Employee ─────────────────────────────────────────────────────────────────
-export type EmploymentType = 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'INTERN';
-export type EmploymentStatus = 'ACTIVE' | 'ON_LEAVE' | 'RESIGNED' | 'TERMINATED';
-
-export interface Employee {
-  id: number;
-  employeeId?: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone?: string;
-  designation?: string;
-  department?: string;
-  departmentId?: number;
-  employmentType?: EmploymentType;
-  employmentStatus?: EmploymentStatus;
-  dateOfJoining?: string;
-  baseSalary?: number;
-  reportingManagerId?: number;
-  officeLocation?: string;
-  isActive?: boolean;
+export interface CreateInvoiceRequest {
+  customerId: number;
+  invoiceDate: string;
+  dueDate?: string;
+  status: InvoiceStatus;
+  billingAddress?: string;
+  shippingAddress?: string;
+  paymentTerms?: string;
+  notes?: string;
+  items?: InvoiceItem[];
 }
 
-export type CreateEmployeeRequest = Omit<Employee, 'id'>;
+// ─── Accounting ───────────────────────────────────────────────────────────────
 
-// ─── Company ──────────────────────────────────────────────────────────────────
-export interface Company {
-  id: number;
-  name: string;
-  legalName?: string;
-  taxId?: string;
-  email?: string;
-  phone?: string;
-  address?: string;
-  city?: string;
-  country?: string;
-  website?: string;
-  industry?: string;
-  isActive?: boolean;
-  createdAt?: string;
-}
-
-// ─── Chart of Accounts ────────────────────────────────────────────────────────
 export type AccountType = 'ASSET' | 'LIABILITY' | 'EQUITY' | 'REVENUE' | 'EXPENSE';
 
 export interface ChartOfAccount {
@@ -182,27 +231,10 @@ export interface ChartOfAccount {
   accountCode: string;
   accountName: string;
   accountType: AccountType;
-  parentAccountId?: number;
+  accountCategory?: string;
   description?: string;
+  currentBalance?: number;
   isActive?: boolean;
-  balance?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
-
-// ─── Dashboard ────────────────────────────────────────────────────────────────
-export interface DashboardStats {
-  totalRevenue: number;
-  totalCustomers: number;
-  totalProducts: number;
-  totalInvoices: number;
-  pendingInvoices: number;
-  overdueInvoices: number;
-  totalEmployees: number;
-  totalSuppliers: number;
-}
-
-export interface RevenueDataPoint {
-  month: string;
-  revenue: number;
-  expenses: number;
-}
-

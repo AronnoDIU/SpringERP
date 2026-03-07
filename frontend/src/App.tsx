@@ -13,6 +13,9 @@ import { LoginPage } from './features/auth/LoginPage';
 const DashboardPage = lazy(() =>
   import('./features/dashboard/DashboardPage').then((m) => ({ default: m.DashboardPage }))
 );
+const CEODashboardPage = lazy(() =>
+  import('./features/dashboard/CEODashboardPage').then((m) => ({ default: m.CEODashboardPage }))
+);
 const CustomersPage = lazy(() =>
   import('./features/customers/CustomersPage').then((m) => ({ default: m.CustomersPage }))
 );
@@ -33,6 +36,9 @@ const AccountingPage = lazy(() =>
 );
 const InventoryPage = lazy(() =>
   import('./features/inventory/InventoryPage').then((m) => ({ default: m.InventoryPage }))
+);
+const SalesPage = lazy(() =>
+  import('./features/sales/CRM')
 );
 
 const queryClient = new QueryClient({
@@ -68,6 +74,14 @@ const App: React.FC = () => {
                 element={
                   <Suspense fallback={<PageLoader />}>
                     <DashboardPage />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/ceo"
+                element={
+                  <Suspense fallback={<PageLoader />}>
+                    <CEODashboardPage />
                   </Suspense>
                 }
               />
@@ -124,6 +138,14 @@ const App: React.FC = () => {
                 element={
                   <Suspense fallback={<PageLoader />}>
                     <InventoryPage />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/sales"
+                element={
+                  <Suspense fallback={<PageLoader />}>
+                    <SalesPage />
                   </Suspense>
                 }
               />
