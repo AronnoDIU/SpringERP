@@ -132,19 +132,19 @@ const navSections: NavSection[] = [
 
 export const Sidebar: React.FC = () => {
   return (
-    <aside className="h-screen w-64 bg-gray-900 text-white flex flex-col fixed left-0 top-0 z-30 shadow-xl">
+    <aside className="h-screen w-64 bg-white dark:bg-slate-900 text-gray-800 dark:text-white flex flex-col fixed left-0 top-0 z-30 shadow-xl border-r border-gray-100 dark:border-slate-800 transition-colors duration-300">
       {/* Logo */}
-      <div className="px-6 py-5 border-b border-gray-700">
+      <div className="px-6 py-5 border-b border-gray-100 dark:border-slate-800">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-blue-600 dark:bg-indigo-600 rounded-lg flex items-center justify-center shadow-sm">
             <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
           <div>
-            <p className="font-bold text-white text-sm">SpringERP</p>
-            <p className="text-xs text-gray-400">Enterprise System</p>
+            <p className="font-bold text-gray-900 dark:text-white text-sm">SpringERP</p>
+            <p className="text-xs text-gray-400 dark:text-slate-500">Enterprise System</p>
           </div>
         </div>
       </div>
@@ -154,7 +154,7 @@ export const Sidebar: React.FC = () => {
         {navSections.map((section) => (
           <div key={section.heading}>
             {section.heading && (
-              <p className="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-500">
+              <p className="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-slate-500">
                 {section.heading}
               </p>
             )}
@@ -166,8 +166,8 @@ export const Sidebar: React.FC = () => {
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
                       isActive
-                        ? 'bg-blue-600 text-white shadow-sm'
-                        : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                        ? 'bg-blue-600 dark:bg-indigo-600 text-white shadow-sm'
+                        : 'text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white'
                     }`
                   }
                 >
@@ -181,8 +181,8 @@ export const Sidebar: React.FC = () => {
       </nav>
 
       {/* Footer */}
-      <div className="px-3 py-4 border-t border-gray-700">
-        <p className="text-xs text-gray-500 text-center">© 2026 SpringERP</p>
+      <div className="px-3 py-4 border-t border-gray-100 dark:border-slate-800">
+        <p className="text-xs text-gray-400 dark:text-slate-600 text-center">© 2026 SpringERP</p>
       </div>
     </aside>
   );

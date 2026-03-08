@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useLogin } from '../../hooks/useAuth';
 import { Icons } from '../../components/Icons';
+import { useThemeStore } from '../../store/theme.store';
 
 export const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [systemTime, setSystemTime] = useState(new Date().toLocaleTimeString());
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  
-  // Theme state
-  const [isDarkMode, setIsDarkMode] = useState(
-    window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-  );
+
+  // Global theme store
+  const isDarkMode = useThemeStore((s) => s.isDark);
+  const toggleTheme = useThemeStore((s) => s.toggle);
 
   const { mutate: login, isLoading, error: authError } = useLogin();
 
@@ -26,15 +25,6 @@ export const LoginPage: React.FC = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDarkMode]);
-
-  const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();

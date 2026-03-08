@@ -1,9 +1,11 @@
 import apiClient from './client';
-import type { Employee, CreateEmployeeRequest } from '../types';
+import type { Employee, CreateEmployeeRequest, PageResponse } from '../types';
 
 export const employeesApi = {
   getAll: () =>
-    apiClient.get<Employee[]>('/employees').then((r) => r.data),
+    apiClient
+      .get<PageResponse<Employee>>('/employees', { params: { size: 200 } })
+      .then((r) => r.data.content),
 
   getById: (id: number) =>
     apiClient.get<Employee>(`/employees/${id}`).then((r) => r.data),

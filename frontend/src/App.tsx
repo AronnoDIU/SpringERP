@@ -7,6 +7,8 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { AppLayout } from './components/layout/AppLayout';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
+import { ThemeProvider } from './components/common/ThemeProvider';
 import { LoginPage } from './features/auth/LoginPage';
 
 // Lazy-loaded feature pages for code splitting
@@ -57,117 +59,55 @@ const PageLoader: React.FC = () => (
   </div>
 );
 
+const SafeSuspense: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <ErrorBoundary>
+    <Suspense fallback={<PageLoader />}>{children}</Suspense>
+  </ErrorBoundary>
+);
+
 const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          {/* Public */}
-          <Route path="/login" element={<LoginPage />} />
+      <ThemeProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* Public */}
+            <Route path="/login" element={<LoginPage />} />
 
-          {/* Protected */}
-          <Route element={<ProtectedRoute />}>
-            <Route element={<AppLayout />}>
-              <Route index element={<Navigate to="/dashboard" replace />} />
-              <Route
-                path="/dashboard"
-                element={
-                  <Suspense fallback={<PageLoader />}>
-                    <DashboardPage />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/ceo"
-                element={
-                  <Suspense fallback={<PageLoader />}>
-                    <CEODashboardPage />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/customers"
-                element={
-                  <Suspense fallback={<PageLoader />}>
-                    <CustomersPage />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/suppliers"
-                element={
-                  <Suspense fallback={<PageLoader />}>
-                    <SuppliersPage />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/products"
-                element={
-                  <Suspense fallback={<PageLoader />}>
-                    <ProductsPage />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/invoices"
-                element={
-                  <Suspense fallback={<PageLoader />}>
-                    <InvoicesPage />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/employees"
-                element={
-                  <Suspense fallback={<PageLoader />}>
-                    <EmployeesPage />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/accounting"
-                element={
-                  <Suspense fallback={<PageLoader />}>
-                    <AccountingPage />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/inventory"
-                element={
-                  <Suspense fallback={<PageLoader />}>
-                    <InventoryPage />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/sales"
-                element={
-                  <Suspense fallback={<PageLoader />}>
-                    <SalesPage />
-                  </Suspense>
-                }
-              />
+            {/* Protected */}
+            <Route element={<ProtectedRoute />}>
+              <Route element={<AppLayout />}>
+                <Route index element={<Navigate to="/dashboard" replace />} />
+                <Route path="/dashboard" element={<SafeSuspense><DashboardPage /></SafeSuspense>} />
+                <Route path="/ceo" element={<SafeSuspense><CEODashboardPage /></SafeSuspense>} />
+                <Route path="/customers" element={<SafeSuspense><CustomersPage /></SafeSuspense>} />
+                <Route path="/suppliers" element={<SafeSuspense><SuppliersPage /></SafeSuspense>} />
+                <Route path="/products" element={<SafeSuspense><ProductsPage /></SafeSuspense>} />
+                <Route path="/invoices" element={<SafeSuspense><InvoicesPage /></SafeSuspense>} />
+                <Route path="/employees" element={<SafeSuspense><EmployeesPage /></SafeSuspense>} />
+                <Route path="/accounting" element={<SafeSuspense><AccountingPage /></SafeSuspense>} />
+                <Route path="/inventory" element={<SafeSuspense><InventoryPage /></SafeSuspense>} />
+                <Route path="/sales" element={<SafeSuspense><SalesPage /></SafeSuspense>} />
+              </Route>
             </Route>
-          </Route>
 
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-      </BrowserRouter>
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </BrowserRouter>
 
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        closeOnClick
-        pauseOnHover
-        draggable
-        theme="light"
-      />
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          closeOnClick
+          pauseOnHover
+          draggable
+          theme="colored"
+        />
 
-      {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+        {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };
